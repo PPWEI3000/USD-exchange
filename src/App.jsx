@@ -1,5 +1,93 @@
 import React, { useState } from 'react';
-import { Calculator, DollarSign, TrendingDown, ArrowRight, Award } from 'lucide-react';
+import { Calculator, DollarSign, TrendingDown, ArrowRight, Award, Copy, Check } from 'lucide-react';
+
+// 將 ResultCard 獨立出來，方便管理「複製成功」的狀態
+const ResultCard = ({ title, data, range }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = (usdValue) => {
+    // 建立一個暫時的文字輸入框來執行複製 (相容性最好的做法)
+    const textArea = document.createElement("textarea");
+    textArea.value = usdValue;
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      setCopied(true);
+      // 2秒後將打勾圖示變回複製圖示
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('複製失敗', err);
+    }
+    document.body.removeChild(textArea);
+  };
+
+  return (
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full">
+      <div className="bg-gradient-to-r from-emerald-500 to-teal-600 px-5 py-4">
+        <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+          <Award size={18} className="text-yellow-300 sm:w-5 sm:h-5" />
+          {title}
+        </h3>
+        <p className="text-emerald-100 text-xs sm:text-sm mt-1">{range}</p>
+      </div>
+      <div className="p-0 flex-grow">
+        <div className="flex justify-center w-full bg-white">
+          {/* 微調表格寬度與間距，並新增最右側的按鈕欄位 */}
+          <table className="w-auto text-xs sm:text-sm text-left table-auto mx-auto min-w-[280px]">
+            <thead className="text-[10px] sm:text-xs text-gray-500 uppercase bg-gray-50/50">
+              <tr>
+                <th className="px-2 py-2 sm:py-3 text-center w-10">排名</th>
+                <th className="px-2 py-2 sm:py-3 text-right w-16">USD</th>
+                <th className="px-2 py-2 sm:py-3 text-right w-16">TWD</th>
+                <th className="px-2 py-2 sm:py-3 text-right font-bold text-emerald-600 w-20">匯率*</th>
+                <th className="px-1 py-2 sm:py-3 w-10 text-center"></th> {/* 複製按鈕專用欄 */}
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((item, index) => (
+                <tr key={index} className="border-b last:border-b-0 hover:bg-emerald-50/50 transition-colors">
+                  <td className="px-2 py-3 sm:py-4 text-center font-bold text-gray-400">
+                    #{index + 1}
+                  </td>
+                  <td className="px-2 py-3 sm:py-4 text-right font-medium text-gray-900 tracking-tight">
+                    ${item.usd.toFixed(2)}
+                  </td>
+                  <td className="px-2 py-3 sm:py-4 text-right font-medium text-gray-900 tracking-tight">
+                    {/* 加入 toLocaleString() 產生千分位逗號 */}
+                    {item.twd.toLocaleString()}
+                  </td>
+                  <td className="px-2 py-3 sm:py-4 text-right font-bold text-emerald-600 tracking-tight">
+                    {item.effectiveRate.toFixed(4)}
+                  </td>
+                  <td className="px-1 py-3 sm:py-4 text-center">
+                    {/* 只在排名 #1 (index === 0) 時顯示複製按鈕 */}
+                    {index === 0 && (
+                      <button
+                        onClick={() => handleCopy(item.usd.toFixed(2))}
+                        className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-600 transition-all active:scale-90"
+                        title="複製美元金額"
+                      >
+                        {copied ? <Check size={16} strokeWidth={3} /> : <Copy size={16} />}
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+              {data.length === 0 && (
+                <tr>
+                  <td colSpan="5" className="px-3 py-8 text-center text-gray-500">
+                    此區間無符合結果
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default function App() {
   const [exchangeRate, setExchangeRate] = useState('');
@@ -48,59 +136,6 @@ export default function App() {
 
     setIsCalculating(false);
   };
-
-  const ResultCard = ({ title, data, range }) => (
-    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full">
-      <div className="bg-gradient-to-r from-emerald-500 to-teal-600 px-5 py-4"> {/* 增加左右 px-5 */}
-        <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-          <Award size={18} className="text-yellow-300 sm:w-5 sm:h-5" />
-          {title}
-        </h3>
-        <p className="text-emerald-100 text-xs sm:text-sm mt-1">{range}</p>
-      </div>
-      <div className="p-0 flex-grow">
-        {/* 調整表格寬度，移除 w-full 改為 w-auto，並置中 */}
-        <div className="flex justify-center w-full bg-white">
-          <table className="w-auto text-xs sm:text-sm text-left table-auto mx-auto min-w-[280px]"> {/* 設定 min-w 確保不會過度縮小 */}
-            <thead className="text-[10px] sm:text-xs text-gray-500 uppercase bg-gray-50/50">
-              <tr>
-                {/* 調整各欄位的寬度與對齊，增加左右 px-3 */}
-                <th className="px-3 py-2 sm:py-3 text-center w-12">排名</th>
-                <th className="px-3 py-2 sm:py-3 text-right w-16">USD</th>
-                <th className="px-3 py-2 sm:py-3 text-right w-16">TWD</th>
-                <th className="px-3 py-2 sm:py-3 text-right font-bold text-emerald-600 w-24">匯率*</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((item, index) => (
-                <tr key={index} className="border-b last:border-b-0 hover:bg-emerald-50/50 transition-colors">
-                  <td className="px-3 py-3 sm:py-4 text-center font-bold text-gray-400">
-                    #{index + 1}
-                  </td>
-                  <td className="px-3 py-3 sm:py-4 text-right font-medium text-gray-900 tracking-tight">
-                    ${item.usd.toFixed(2)}
-                  </td>
-                  <td className="px-3 py-3 sm:py-4 text-right font-medium text-gray-900 tracking-tight">
-                    {item.twd}
-                  </td>
-                  <td className="px-3 py-3 sm:py-4 text-right font-bold text-emerald-600 tracking-tight">
-                    {item.effectiveRate.toFixed(4)}
-                  </td>
-                </tr>
-              ))}
-              {data.length === 0 && (
-                <tr>
-                  <td colSpan="4" className="px-3 py-8 text-center text-gray-500">
-                    此區間無符合結果
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-slate-50 py-6 sm:py-8 px-4 sm:px-6 lg:px-8 font-sans">
@@ -159,7 +194,8 @@ export default function App() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
               <ResultCard title="永豐銀" range="新台幣 250 ~ 499 元" data={results.range1} />
               <ResultCard title="國泰銀" range="新台幣 500 ~ 999 元" data={results.range2} />
-              <ResultCard title="玉山銀" range="新台幣 1000 ~ 1499 元" data={results.range3} />
+              {/* 這裡也把標題的數字加上了千分位 */}
+              <ResultCard title="玉山銀" range="新台幣 1,000 ~ 1,499 元" data={results.range3} />
             </div>
             
             <div className="mt-8 bg-blue-50 rounded-xl p-4 text-sm text-blue-800 flex gap-3 border border-blue-100 mx-1">
@@ -169,7 +205,7 @@ export default function App() {
                 <ul className="list-disc pl-5 space-y-1">
                   <li><strong>台幣 (TWD)</strong> = 四捨五入(美元 × 輸入匯率)</li>
                   <li><strong>實質匯率*</strong> = 四捨五入後的台幣 ÷ 美元 (越低越划算)</li>
-                  <li>系統會自動遍歷 1.00 至 100.00 美元進行窮舉試算。</li>
+                  <li><strong>一鍵複製</strong> = 點擊表格右側按鈕，即可將最佳美元金額複製到剪貼簿。</li>
                 </ul>
               </div>
             </div>
