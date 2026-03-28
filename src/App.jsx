@@ -33,7 +33,6 @@ const ResultCard = ({ title, data, range }) => {
       </div>
       <div className="p-0 flex-grow">
         <div className="flex justify-center w-full bg-white">
-          {/* 微調表格寬度與間距，並新增最右側的按鈕欄位 */}
           <table className="w-auto text-xs sm:text-sm text-left table-auto mx-auto min-w-[280px]">
             <thead className="text-[10px] sm:text-xs text-gray-500 uppercase bg-gray-50/50">
               <tr>
@@ -41,7 +40,7 @@ const ResultCard = ({ title, data, range }) => {
                 <th className="px-2 py-2 sm:py-3 text-right w-16">USD</th>
                 <th className="px-2 py-2 sm:py-3 text-right w-16">TWD</th>
                 <th className="px-2 py-2 sm:py-3 text-right font-bold text-emerald-600 w-20">匯率*</th>
-                <th className="px-1 py-2 sm:py-3 w-10 text-center"></th> {/* 複製按鈕專用欄 */}
+                <th className="px-1 py-2 sm:py-3 w-10 text-center"></th>
               </tr>
             </thead>
             <tbody>
@@ -54,14 +53,12 @@ const ResultCard = ({ title, data, range }) => {
                     ${item.usd.toFixed(2)}
                   </td>
                   <td className="px-2 py-3 sm:py-4 text-right font-medium text-gray-900 tracking-tight">
-                    {/* 加入 toLocaleString() 產生千分位逗號 */}
                     {item.twd.toLocaleString()}
                   </td>
                   <td className="px-2 py-3 sm:py-4 text-right font-bold text-emerald-600 tracking-tight">
                     {item.effectiveRate.toFixed(4)}
                   </td>
                   <td className="px-1 py-3 sm:py-4 text-center">
-                    {/* 只在排名 #1 (index === 0) 時顯示複製按鈕 */}
                     {index === 0 && (
                       <button
                         onClick={() => handleCopy(item.usd.toFixed(2))}
@@ -193,8 +190,7 @@ export default function App() {
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
               <ResultCard title="永豐銀" range="新台幣 250 ~ 499 元" data={results.range1} />
-              <ResultCard title="國泰銀" range="新台幣 500 ~ 999 元" data={results.range2} />
-              {/* 這裡也把標題的數字加上了千分位 */}
+              <ResultCard title="國泰銀 台新銀" range="新台幣 500 ~ 999 元" data={results.range2} />
               <ResultCard title="玉山銀" range="新台幣 1,000 ~ 1,499 元" data={results.range3} />
             </div>
             
