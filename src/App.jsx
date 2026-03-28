@@ -51,7 +51,7 @@ export default function App() {
 
   const ResultCard = ({ title, data, range }) => (
     <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full">
-      <div className="bg-gradient-to-r from-emerald-500 to-teal-600 px-4 sm:px-6 py-3 sm:py-4">
+      <div className="bg-gradient-to-r from-emerald-500 to-teal-600 px-5 py-4"> {/* 增加左右 px-5 */}
         <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
           <Award size={18} className="text-yellow-300 sm:w-5 sm:h-5" />
           {title}
@@ -59,47 +59,51 @@ export default function App() {
         <p className="text-emerald-100 text-xs sm:text-sm mt-1">{range}</p>
       </div>
       <div className="p-0 flex-grow">
-        <table className="w-full text-xs sm:text-sm text-left table-fixed sm:table-auto">
-          <thead className="text-[10px] sm:text-xs text-gray-500 uppercase bg-gray-50">
-            <tr>
-              <th className="w-10 sm:w-auto px-1 sm:px-4 py-2 sm:py-3 text-center">排名</th>
-              <th className="px-1 sm:px-4 py-2 sm:py-3 text-right">USD</th>
-              <th className="px-1 sm:px-4 py-2 sm:py-3 text-right">TWD</th>
-              <th className="px-1 sm:px-4 py-2 sm:py-3 text-right font-bold text-emerald-600">匯率*</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((item, index) => (
-              <tr key={index} className="border-b last:border-b-0 hover:bg-emerald-50 transition-colors">
-                <td className="px-1 sm:px-4 py-3 sm:py-4 text-center font-bold text-gray-400">
-                  #{index + 1}
-                </td>
-                <td className="px-1 sm:px-4 py-3 sm:py-4 text-right font-medium text-gray-900 tracking-tight">
-                  ${item.usd.toFixed(2)}
-                </td>
-                <td className="px-1 sm:px-4 py-3 sm:py-4 text-right font-medium text-gray-900 tracking-tight">
-                  {item.twd}
-                </td>
-                <td className="px-1 sm:px-4 py-3 sm:py-4 text-right font-bold text-emerald-600 tracking-tight">
-                  {item.effectiveRate.toFixed(4)}
-                </td>
-              </tr>
-            ))}
-            {data.length === 0 && (
+        {/* 調整表格寬度，移除 w-full 改為 w-auto，並置中 */}
+        <div className="flex justify-center w-full bg-white">
+          <table className="w-auto text-xs sm:text-sm text-left table-auto mx-auto min-w-[280px]"> {/* 設定 min-w 確保不會過度縮小 */}
+            <thead className="text-[10px] sm:text-xs text-gray-500 uppercase bg-gray-50/50">
               <tr>
-                <td colSpan="4" className="px-4 py-8 text-center text-gray-500">
-                  此區間無符合結果
-                </td>
+                {/* 調整各欄位的寬度與對齊，增加左右 px-3 */}
+                <th className="px-3 py-2 sm:py-3 text-center w-12">排名</th>
+                <th className="px-3 py-2 sm:py-3 text-right w-16">USD</th>
+                <th className="px-3 py-2 sm:py-3 text-right w-16">TWD</th>
+                <th className="px-3 py-2 sm:py-3 text-right font-bold text-emerald-600 w-24">匯率*</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {data.map((item, index) => (
+                <tr key={index} className="border-b last:border-b-0 hover:bg-emerald-50/50 transition-colors">
+                  <td className="px-3 py-3 sm:py-4 text-center font-bold text-gray-400">
+                    #{index + 1}
+                  </td>
+                  <td className="px-3 py-3 sm:py-4 text-right font-medium text-gray-900 tracking-tight">
+                    ${item.usd.toFixed(2)}
+                  </td>
+                  <td className="px-3 py-3 sm:py-4 text-right font-medium text-gray-900 tracking-tight">
+                    {item.twd}
+                  </td>
+                  <td className="px-3 py-3 sm:py-4 text-right font-bold text-emerald-600 tracking-tight">
+                    {item.effectiveRate.toFixed(4)}
+                  </td>
+                </tr>
+              ))}
+              {data.length === 0 && (
+                <tr>
+                  <td colSpan="4" className="px-3 py-8 text-center text-gray-500">
+                    此區間無符合結果
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 py-4 sm:py-8 px-3 sm:px-6 lg:px-8 font-sans">
+    <div className="min-h-screen bg-slate-50 py-6 sm:py-8 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="max-w-5xl mx-auto space-y-6 sm:space-y-8">
         
         <div className="text-center space-y-2 sm:space-y-4">
@@ -158,14 +162,14 @@ export default function App() {
               <ResultCard title="玉山銀" range="新台幣 1000 ~ 1499 元" data={results.range3} />
             </div>
             
-            <div className="mt-8 bg-blue-50 rounded-xl p-4 text-sm text-blue-800 flex gap-3 border border-blue-100">
+            <div className="mt-8 bg-blue-50 rounded-xl p-4 text-sm text-blue-800 flex gap-3 border border-blue-100 mx-1">
               <div className="mt-0.5">💡</div>
               <div>
                 <p className="font-semibold mb-1">計算說明：</p>
                 <ul className="list-disc pl-5 space-y-1">
                   <li><strong>台幣 (TWD)</strong> = 四捨五入(美元 × 輸入匯率)</li>
-                  <li><strong>實質匯率*</strong> = 四捨五入後的台幣 ÷ 美元 (數值越低代表換匯越划算)</li>
-                  <li>系統會自動遍歷 1.00 至 100.00 美元 (每次遞增 0.01 美元) 進行窮舉試算。</li>
+                  <li><strong>實質匯率*</strong> = 四捨五入後的台幣 ÷ 美元 (越低越划算)</li>
+                  <li>系統會自動遍歷 1.00 至 100.00 美元進行窮舉試算。</li>
                 </ul>
               </div>
             </div>
